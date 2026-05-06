@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google News - US Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --google-blue: #1a73e8;
+            --google-gray: #5f6368;
+            --border-color: #dadce0;
+            --sidebar-width: 256px;
+            --right-panel-width: 300px;
+            --surface-color: #f8f9fa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #202124;
+        }
+
+        /* — Header — */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            height: 64px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 1000;
+        }
+
+        .nav-left { display: flex; align-items: center; min-width: var(--sidebar-width); }
+        .logo { font-family: 'Google Sans', sans-serif; font-size: 22px; color: var(--google-gray); margin-left: 8px; }
+
+        .nav-center { flex-grow: 1; max-width: 720px; margin: 0 20px; }
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: #f1f3f4;
+            padding: 0 16px;
+            border-radius: 8px;
+            height: 48px;
+        }
+        .search-container input { background: transparent; border: none; width: 100%; padding: 10px; font-size: 16px; outline: none; }
+
+        /* — Main Layout — */
+        .main-container { display: flex; max-width: 1280px; margin: 0 auto; padding: 16px 24px; }
+
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); position: sticky; top: 80px; height: calc(100vh - 80px); padding-right: 12px; }
+
+        /* 구글 스타일 인사이트 위젯 */
+        .insight-widget {
+            display: block;
+            text-decoration: none;
+            background-color: #eaf1fb;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+        }
+        .insight-widget:hover { background-color: #d3e3fd; border: 1px solid #c2e7ff; }
+        
+        .insight-label {
+            display: block;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px; 
+            font-weight: 700;
+            color: #0b57d0;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .insight-title {
+            display: block;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #001d35;
+            line-height: 1.4;
+            margin-bottom: 2px;
+        }
+        .insight-subtext {
+            display: block;
+            font-size: 9px; 
+            color: #444746;
+            margin-bottom: 16px;
+        }
+
+        /* 삼각형 그래픽 위젯 */
+        .visual-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-top: 20px; 
+        }
+        .visual-header {
+            font-size: 11px;
+            color: #5f6368;
+            font-weight: 500;
+            margin-bottom: 12px;
+            width: 100%;
+            text-align: center; 
+        }
+        .triangle-graphic {
+            width: 0;
+            height: 0;
+            border-left: 55px solid transparent;
+            border-right: 55px solid transparent;
+            border-top: 95.26px solid #d93025;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+        .triangle-text {
+            position: absolute;
+            top: -62px; 
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffffff;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 5px; 
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 0.3px;
+        }
+        .visual-caption {
+            margin-top: 10px;
+            font-size: 9px; 
+            color: #000000; /* 색상을 블랙으로 변경 */
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .insight-footer {
+            display: flex;
+            align-items: center;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: #0b57d0;
+            margin-top: 24px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            height: 40px;
+            text-decoration: none;
+            color: #3c4043;
+            font-size: 14px;
+            border-radius: 20px;
+            margin-bottom: 4px;
+        }
+        .nav-item.active { background-color: #c2e7ff; color: #001d35; font-weight: 500; }
+        .nav-item:hover:not(.active) { background-color: #f1f3f4; }
+
+        .divider { height: 1px; background-color: var(--border-color); margin: 12px 0; }
+
+        /* Feed Area */
+        .feed { flex-grow: 1; padding: 0 24px; }
+        .feed h1 { font-family: 'Google Sans', sans-serif; font-size: 28px; font-weight: 400; margin-bottom: 24px; }
+
+        .news-card { border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 16px; overflow: hidden; transition: box-shadow 0.2s; }
+        .news-card:hover { box-shadow: 0 1px 3px rgba(60,64,67,.3); }
+        .card-content { padding: 16px; display: flex; justify-content: space-between; }
+        .source-name { font-size: 12px; font-weight: 500; color: #3c4043; margin-bottom: 8px; display: block; }
+        .news-title { font-family: 'Google Sans', sans-serif; font-size: 18px; line-height: 24px; font-weight: 500; color: #202124; }
+        .thumbnail { width: 100px; height: 100px; background-color: #f8f9fa; border-radius: 8px; margin-left: 16px; }
+
+        .more-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 48px;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--google-blue);
+            cursor: pointer;
+            margin-top: 24px;
+            margin-bottom: 40px;
+            transition: background-color 0.2s;
+        }
+        .more-button:hover { background-color: #f8f9fa; border-color: #dadce0; }
+
+        /* Right Panel */
+        .right-panel { width: var(--right-panel-width); }
+        .widget { border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+        .widget h3 { font-family: 'Google Sans', sans-serif; font-size: 16px; font-weight: 500; margin-bottom: 12px; }
+
+        .weather-sub-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--google-gray);
+        }
+        .weather-link {
+            text-decoration: none;
+            color: var(--google-blue);
+            font-weight: 500;
+        }
+
+        @media (max-width: 1024px) { .right-panel { display: none; } }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="logo">Google News</div>
+        </div>
+        <div class="nav-center">
+            <div class="search-container">
+                <input type="text" placeholder="Search for topics, locations & sources">
+            </div>
+        </div>
+        <div class="nav-right">
+            <div style="width: 32px; height: 32px; background: #00897b; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">A</div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <nav class="sidebar">
+            <a href="index.html" class="insight-widget">
+                <span class="insight-label">Society Pulse</span>
+                <span class="insight-title">This week’s public sentiment</span>
+                <span class="insight-subtext"><span id="response-count">12,482</span> responses · Updated weekly</span>
+                
+                <div class="visual-container">
+                    <div class="visual-header">Last week's insight</div>
+                    
+                    <div class="triangle-graphic">
+                        <span class="triangle-text">MISINFORMATION</span>
+                    </div>
+                    
+                    <div class="visual-caption">Unstable · Misinformation · Strongly Negative</div>
+                </div>
+
+                <div class="insight-footer">
+                    Add your response →
+                </div>
+            </a>
+
+            <a href="#" class="nav-item active">Top stories</a>
+            <a href="#" class="nav-item">For you</a>
+            <a href="#" class="nav-item">Following</a>
+            <div class="divider"></div>
+            <a href="#" class="nav-item">U.S.</a>
+            <a href="#" class="nav-item">World</a>
+            <a href="#" class="nav-item">Technology</a>
+            <a href="#" class="nav-item">Entertainment</a>
+            <a href="#" class="nav-item">Science</a>
+            <a href="#" class="nav-item">Health</a>
+        </nav>
+
+        <section class="feed">
+            <h1>Top stories</h1>
+            
+            <article class="news-card">
+                <div class="card-content">
+                    <div class="text-group">
+                        <span class="source-name">The Wall Street Journal</span>
+                        <h2 class="news-title">Stocks Rally as Inflation Data Meets Market Expectations</h2>
+                        <p style="font-size: 12px; color: var(--google-gray); margin-top: 8px;">45 minutes ago</p>
+                    </div>
+                    <div class="thumbnail"></div>
+                </div>
+            </article>
+
+            <article class="news-card">
+                <div class="card-content">
+                    <div class="text-group">
+                        <span class="source-name">CNN</span>
+                        <h2 class="news-title">New Breakthrough in Sustainable Energy Storage Announced</h2>
+                        <p style="font-size: 12px; color: var(--google-gray); margin-top: 8px;">2 hours ago</p>
+                    </div>
+                    <div class="thumbnail"></div>
+                </div>
+            </article>
+
+            <article class="news-card">
+                <div class="card-content">
+                    <div class="text-group">
+                        <span class="source-name">The New York Times</span>
+                        <h2 class="news-title">Global Summit Concludes with Historic Climate Accord</h2>
+                        <p style="font-size: 12px; color: var(--google-gray); margin-top: 8px;">3 hours ago</p>
+                    </div>
+                    <div class="thumbnail"></div>
+                </div>
+            </article>
+
+            <article class="news-card">
+                <div class="card-content">
+                    <div class="text-group">
+                        <span class="source-name">BBC News</span>
+                        <h2 class="news-title">Tech Giant Unveils Next-Generation AI Model</h2>
+                        <p style="font-size: 12px; color: var(--google-gray); margin-top: 8px;">5 hours ago</p>
+                    </div>
+                    <div class="thumbnail"></div>
+                </div>
+            </article>
+
+            <button class="more-button">
+                More Top stories
+            </button>
+        </section>
+
+        <aside class="right-panel">
+            <div class="widget">
+                <h3>Local weather</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>New York, NY</strong><br>
+                        <span style="font-size: 13px; color: var(--google-gray);">Mostly Cloudy</span>
+                    </div>
+                    <span style="font-size: 32px; font-weight: 400;">65°F</span>
+                </div>
+                <div class="weather-sub-item">
+                    <span>Precipitation: 10%</span>
+                    <span>Humidity: 72%</span>
+                    <span>Wind: 5 mph</span>
+                </div>
+                <div class="weather-sub-item" style="border: none; padding: 0; margin-top: 16px; justify-content: flex-end;">
+                    <a href="#" class="weather-link">More details</a>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        function updateResponseCount() {
+            const countElement = document.getElementById('response-count');
+            let currentCount = parseInt(countElement.innerText.replace(/,/g, ''));
+            const increase = Math.floor(Math.random() * 3) + 1;
+            currentCount += increase;
+            countElement.innerText = currentCount.toLocaleString();
+        }
+
+        function startCounter() {
+            const randomTime = Math.floor(Math.random() * (7000 - 3000 + 1)) + 3000;
+            setTimeout(() => {
+                updateResponseCount();
+                startCounter();
+            }, randomTime);
+        }
+
+        window.onload = startCounter;
+    </script>
+</body>
+</html>```

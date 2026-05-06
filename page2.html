@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Society Pulse - Google News</title>
+    <style>
+        /* Google Material Design 3 Style */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #ffffff; 
+            color: #1F1F1F; 
+            font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif; 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        /* HEADER */
+        .header {
+            padding: 20px 80px 40px 80px;
+            background: #ffffff;
+            flex-shrink: 0;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #E0E0E0;
+        }
+        .google-logo {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 22px;
+            color: #5F6368;
+            font-weight: 500;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 500;
+            margin: 0;
+            color: #1A73E8; 
+            letter-spacing: -0.5px;
+        }
+        .header .info-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .header p {
+            font-size: 14px;
+            color: #5F6368;
+            margin: 0;
+        }
+        .header .dot-divider {
+            color: #5F6368;
+            font-weight: bold;
+        }
+
+        /* CONTAINER */
+        .container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            width: 100%; 
+            padding: 0 80px; 
+            flex: 1; 
+        }
+
+        .left-content { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        #triangleGrid { 
+            width: 100%; 
+            max-width: 550px; 
+            height: auto; 
+        }
+
+        /* LIVE INDICATOR */
+        #liveCounter { 
+            margin-top: 30px; 
+            color: #1E8E3E; 
+            font-size: 13px; 
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.2px;
+        }
+        #liveCounter::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #1E8E3E;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* RIGHT PANEL */
+        .right-panel { 
+            width: 420px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            border-left: 1px solid #E0E0E0; 
+            padding-left: 50px; 
+            height: 85%; 
+        }
+
+        .alignment-box { 
+            background: #eaf1fb; 
+            border-radius: 16px;
+            padding: 24px; 
+            margin-bottom: 24px; 
+        }
+        .alignment-box .label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #0b57d0;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .alignment-box .percent-msg { 
+            font-size: 20px; 
+            font-weight: 500; 
+            color: #001d35;
+        }
+
+        /* NAVIGATION MENU */
+        .main-nav { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .menu-wrap { 
+            padding: 18px; 
+            background: #ffffff;
+            border: 1px solid #DADCE0; 
+            border-radius: 12px;
+            position: relative; 
+            text-decoration: none; 
+            color: inherit; 
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .menu-wrap:hover {
+            background: #F8F9FA;
+            border-color: #1A73E8;
+        }
+        .menu-wrap::after { 
+            content: '→'; 
+            position: absolute; 
+            right: 20px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            color: #1A73E8; 
+            font-weight: bold; 
+        }
+        .menu-item { font-size: 14px; color: #1F1F1F; margin-bottom: 6px; font-weight: 600; }
+        .live-top-info { font-size: 12px; color: #70757A; display: flex; align-items: center; gap: 4px; }
+
+        /* PREVIOUS RESULT WIDGET (Bottom placement) */
+        .prev-result-widget {
+            border: 1px solid #DADCE0;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #ffffff;
+        }
+        .prev-result-header {
+            width: 100%;
+            font-size: 12px;
+            color: #5F6368;
+            font-weight: 500;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .visual-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .triangle-graphic {
+            width: 0;
+            height: 0;
+            border-left: 45px solid transparent;
+            border-right: 45px solid transparent;
+            border-top: 78px solid #d93025; 
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+        .triangle-text {
+            position: absolute;
+            top: -50px; /* 위치 미세 조정 */
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffffff;
+            font-size: 5px; /* 더 작게 수정 */
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 0.3px;
+        }
+        .visual-caption {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #1F1F1F;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .cell { cursor: pointer; stroke-width: 0.8; transition: 0.2s; fill-opacity: 0.6; stroke: #ffffff; }
+        .grid-word { font-size: 2.8px; fill: #3C4043; font-weight: bold; text-anchor: middle; pointer-events: none; }
+        
+        #modalOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 99; cursor: pointer; backdrop-filter: blur(4px); }
+        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; text-align: center; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo-area">
+        <div class="google-logo">Google News</div>
+    </div>
+    <h1>Society Pulse</h1>
+    <div class="info-line">
+        <p>Weekly public sentiment insights</p>
+        <span class="dot-divider">·</span>
+        <p style="color: #70757A;">Updated weekly</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="left-content">
+        <svg id="triangleGrid" viewBox="0 0 500 500"></svg>
+        <div id="liveCounter">0 RESPONSES</div>
+    </div>
+    <div class="right-panel">
+        <div class="alignment-box">
+            <span class="label">Personal Insight</span>
+            <div class="percent-msg" id="personalStat">Analyzing your response...</div>
+        </div>
+
+        <div class="main-nav" id="navMenu"></div>
+
+        <div class="prev-result-widget">
+            <div class="prev-result-header">Last week's insight</div>
+            <div class="visual-container">
+                <div class="triangle-graphic">
+                    <span class="triangle-text">MISINFORMATION</span>
+                </div>
+                <div class="visual-caption">Unstable · Misinformation · Strongly Negative</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalOverlay" onclick="closeModal()"></div>
+<div id="modal">
+    <svg id="modalTriSvg" width="500" height="500" viewBox="0 0 500 500"></svg>
+</div>
+
+<script>
+    const historyData = JSON.parse(localStorage.getItem("socialHistory")) || [];
+
+    function init() {
+        drawGrid();
+        updateMainUI();
+        startLiveCounter();
+    }
+
+    function startLiveCounter() {
+        const counterEl = document.getElementById("liveCounter");
+        let currentCount = 12482 + historyData.length;
+        
+        function tick() {
+            currentCount += Math.floor(Math.random() * 2);
+            counterEl.textContent = `${currentCount.toLocaleString()} RESPONSES`;
+            setTimeout(tick, Math.random() * 4000 + 2000);
+        }
+        tick();
+    }
+
+    function drawGrid() {
+        const svg = document.getElementById("triangleGrid");
+        svg.innerHTML = "";
+        const rows = 9, size = 48, h = Math.sqrt(3)/2 * size, cx = 250, sy = 50;
+        let slots = { stable: [], unstable: [] };
+        for(let r=0; r<rows; r++) {
+            const count = r+1; const startX = cx - (count*size)/2;
+            for(let c=0; c<count; c++) {
+                const x = startX + c*size; const y = sy + r*h;
+                slots.stable.push({x, y, isUp: true});
+                if(c < count-1) slots.unstable.push({x: x + size/2, y, isUp: false});
+            }
+        }
+        let sIdx = 0, uIdx = 0;
+        historyData.forEach((data) => {
+            let slot = data.state === "stable" ? slots.stable[sIdx++] : slots.unstable[uIdx++];
+            if(slot) createTri(svg, slot.x, slot.y, size, h, data, slot.isUp);
+        });
+    }
+
+    function createTri(parent, x, y, size, h, data, isUpright) {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.onclick = () => openModal(data);
+        const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        const pts = isUpright ? `${x+size/2},${y} ${x},${y+h} ${x+size},${y+h}` : `${x},${y} ${x+size},${y} ${x+size/2},${y+h}`;
+        poly.setAttribute("points", pts); poly.setAttribute("fill", data.color); poly.setAttribute("class", "cell");
+        g.appendChild(poly);
+        const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txt.setAttribute("x", x+size/2); txt.setAttribute("y", isUpright ? y+h*0.7 : y+h*0.4);
+        txt.setAttribute("class", "grid-word"); txt.textContent = data.word; 
+        g.appendChild(txt); parent.appendChild(g);
+    }
+
+    function updateMainUI() {
+        if(historyData.length === 0) {
+            document.getElementById("personalStat").textContent = "You match --% of community";
+        } else {
+            const latest = historyData[historyData.length - 1];
+            const same = historyData.filter(d => d.state === latest.state && d.color === latest.color && d.word === latest.word).length;
+            const p = Math.round((same / historyData.length) * 100);
+            document.getElementById("personalStat").textContent = `You match ${p}% of community`;
+        }
+        
+        const nav = document.getElementById("navMenu");
+        const getTopStats = (key) => {
+            if(historyData.length === 0) return { val: "--", pct: 0 };
+            const map = {}; 
+            historyData.forEach(d => map[d[key]] = (map[d[key]] || 0) + 1);
+            const topKey = Object.keys(map).length ? Object.keys(map).reduce((a, b) => map[a] > map[b] ? a : b) : "--";
+            const topPct = historyData.length ? Math.round((map[topKey] / historyData.length) * 100) : 0;
+            return { val: topKey, pct: topPct };
+        };
+
+        const topState = getTopStats('state');
+        const topWord = getTopStats('word');
+        const topColor = getTopStats('color');
+
+        const colorNames = {
+            '#d93025': 'Strongly Negative', '#f9ab00': 'Negative', '#bdc1c6': 'Neutral', '#1e8e3e': 'Positive', '#1a73e8': 'Strongly Positive'
+        };
+        const activeColorName = colorNames[topColor.val] || topColor.val;
+
+        nav.innerHTML = `
+            <a href="detail.html?q=1" class="menu-wrap">
+                <div class="menu-item">1. How does society feel?</div>
+                <div class="live-top-info">
+                    Top: ${topState.val === 'stable' ? 'Stable' : 'Unstable'} 
+                    <span style="color:#1A73E8; margin-left:2px;">▲ ${topState.pct}%</span>
+                </div>
+            </a>
+            <a href="detail.html?q=2" class="menu-wrap">
+                <div class="menu-item">2. What influenced your view?</div>
+                <div class="live-top-info">
+                    Top: ${topWord.val} 
+                    <span style="color:#1A73E8; margin-left:2px;">▲ ${topWord.pct}%</span>
+                </div>
+            </a>
+            <a href="detail.html?q=3" class="menu-wrap">
+                <div class="menu-item">3. How strong is this feeling?</div>
+                <div class="live-top-info">
+                    Top: ${activeColorName} 
+                    <span style="color:#1A73E8; margin-left:2px;">▲ ${topColor.pct}%</span>
+                </div>
+            </a>
+        `;
+    }
+
+    function openModal(data) {
+        document.getElementById("modalOverlay").style.display = "block";
+        document.getElementById("modal").style.display = "block";
+        const mSvg = document.getElementById("modalTriSvg"); mSvg.innerHTML = ""; 
+        const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        const cx = 250, cy = 250;
+        let pts = (data.state === "stable") ? `${cx},${cy-140} ${cx-140},${cy+120} ${cx+140},${cy+120}` : `${cx},${cy+140} ${cx-140},${cy-120} ${cx+140},${cy-120}`;
+        poly.setAttribute("points", pts); poly.setAttribute("fill", data.color); poly.setAttribute("fill-opacity", "0.25"); 
+        poly.setAttribute("stroke", data.color); poly.setAttribute("stroke-width", "1.5"); mSvg.appendChild(poly);
+        const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txt.setAttribute("x", cx); txt.setAttribute("y", cy); txt.setAttribute("fill", "#1F1F1F"); 
+        txt.setAttribute("font-size", "14");
+        txt.setAttribute("font-weight", "500");
+        txt.setAttribute("text-anchor", "middle"); txt.setAttribute("dominant-baseline", "middle");
+        txt.textContent = data.word; mSvg.appendChild(txt);
+    }
+    function closeModal() { document.getElementById("modalOverlay").style.display = "none"; document.getElementById("modal").style.display = "none"; }
+    init();
+</script>
+</body>
+</html>

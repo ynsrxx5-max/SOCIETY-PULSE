@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Society Pulse - Google News</title>
+
+    <style>
+        /* Google Material Design 3 Styling */
+        body {
+            margin: 0;
+            font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            color: #1F1F1F;
+        }
+
+        /* HEADER */
+        .header {
+            padding: 20px 80px 40px 80px;
+            background: #ffffff;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #E0E0E0; /* 첫 페이지와 같은 구분선 */
+        }
+
+        .google-logo {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 22px;
+            color: #5F6368;
+            font-weight: 500;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 500;
+            margin: 0;
+            color: #1A73E8; /* 요청하신 블루 색상 유지 */
+            letter-spacing: -0.5px;
+        }
+
+        /* 부가 정보를 일자로 배치 */
+        .info-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #5F6368;
+            margin: 0;
+        }
+
+        .header .dot-divider {
+            color: #5F6368;
+        }
+
+        .header .stat {
+            font-size: 14px;
+            color: #70757A;
+        }
+
+        /* LAYOUT */
+        .layout {
+            display: flex;
+            height: calc(100vh - 180px);
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* LEFT */
+        .left {
+            width: 35%;
+            padding: 40px 80px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .q {
+            font-size: 15px;
+            font-weight: 600;
+            color: #3C4043;
+            margin-bottom: 16px;
+        }
+
+        /* BUTTON */
+        button {
+            width: 100%;
+            padding: 12px 24px;
+            margin-bottom: 10px;
+            background: #ffffff;
+            border: 1px solid #DADCE0;
+            color: #3C4043;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+        }
+
+        button:hover {
+            background: #F1F3F4;
+            border-color: #1A73E8;
+            color: #1A73E8;
+        }
+
+        /* SUBMIT BUTTON */
+        button.submit-btn {
+            background: #1A73E8;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        button.submit-btn:hover {
+            background: #1765CC;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+        }
+
+        /* WORD TAGS */
+        .word {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 4px;
+            border: 1px solid #DADCE0;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #3C4043;
+            cursor: pointer;
+        }
+
+        .word:hover {
+            background: #E8F0FE;
+            border-color: #1A73E8;
+            color: #1967D2;
+        }
+
+        /* COLOR ROW */
+        .color-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border: 1px solid #DADCE0;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .color-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        /* CENTER */
+        .center {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            background: #F8F9FA;
+        }
+
+        canvas {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #70757A;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* RIGHT PANEL */
+        .right {
+            width: 20%;
+            padding: 40px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .submit-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .live-status {
+            font-size: 12px;
+            color: #5F6368;
+            margin-top: 24px;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        .left::-webkit-scrollbar { width: 8px; }
+        .left::-webkit-scrollbar-track { background: #f1f1f1; }
+        .left::-webkit-scrollbar-thumb { background: #DADCE0; border-radius: 10px; }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <div class="logo-area">
+        <div class="google-logo">Google News</div>
+    </div>
+    <h1>Society Pulse</h1>
+    <div class="info-line">
+        <p>Weekly public sentiment</p>
+        <span class="dot-divider">·</span>
+        <span class="stat">12K+ responses · Updated weekly</span>
+    </div>
+</div>
+
+<div class="layout">
+
+    <div class="left">
+        <div class="section">
+            <div class="q">1. How does society feel?</div>
+            <button onclick="setStable()">▲ Stable</button>
+            <button onclick="setUnstable()">▼ Unstable</button>
+        </div>
+
+        <div class="section">
+            <div class="q">2. What influenced your view?</div>
+            <span class="word" onclick="selectWord(this)">Growth</span>
+            <span class="word" onclick="selectWord(this)">Innovation</span>
+            <span class="word" onclick="selectWord(this)">Freedom</span>
+            <span class="word" onclick="selectWord(this)">Diversity</span>
+            <span class="word" onclick="selectWord(this)">Opportunity</span>
+            <span class="word" onclick="selectWord(this)">Connection</span>
+            <span class="word" onclick="selectWord(this)">Communication</span>
+            <span class="word" onclick="selectWord(this)">Progress</span>
+            <span class="word" onclick="selectWord(this)">Technology</span>
+            <span class="word" onclick="selectWord(this)">AI</span>
+            <span class="word" onclick="selectWord(this)">Internet</span>
+            <span class="word" onclick="selectWord(this)">SNS</span>
+            <span class="word" onclick="selectWord(this)">Information</span>
+            <span class="word" onclick="selectWord(this)">Money</span>
+            <span class="word" onclick="selectWord(this)">Work</span>
+            <span class="word" onclick="selectWord(this)">Globalization</span>
+            <span class="word" onclick="selectWord(this)">Inequality</span>
+            <span class="word" onclick="selectWord(this)">Anxiety</span>
+            <span class="word" onclick="selectWord(this)">Polarization</span>
+            <span class="word" onclick="selectWord(this)">Surveillance</span>
+            <span class="word" onclick="selectWord(this)">Misinformation</span>
+            <span class="word" onclick="selectWord(this)">Climate Crisis</span>
+            <span class="word" onclick="selectWord(this)">Instability</span>
+            <span class="word" onclick="selectWord(this)">Isolation</span>
+        </div>
+
+        <div class="section">
+            <div class="q">3. How strong is this feeling?</div>
+            <div class="color-row" onclick="setColor('#d93025')"> <div class="color-dot" style="background:#d93025"></div>Strongly Negative</div>
+            <div class="color-row" onclick="setColor('#f9ab00')"> <div class="color-dot" style="background:#f9ab00"></div>Negative</div>
+            <div class="color-row" onclick="setColor('#bdc1c6')"> <div class="color-dot" style="background:#bdc1c6"></div>Neutral</div>
+            <div class="color-row" onclick="setColor('#1e8e3e')"> <div class="color-dot" style="background:#1e8e3e"></div>Positive</div>
+            <div class="color-row" onclick="setColor('#1a73e8')"> <div class="color-dot" style="background:#1a73e8"></div>Strongly Positive</div>
+        </div>
+    </div>
+
+    <div class="center">
+        <canvas id="canvas" width="500" height="500"></canvas>
+        <div class="hint">
+            Appears instantly · Included in weekly results
+        </div>
+    </div>
+
+    <div class="right">
+        <div class="submit-area">
+            <button class="submit-btn" onclick="saveSelection()">Add your response →</button>
+            <div class="live-status">Live · Real-time updates · Anonymous</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    let state = "stable";
+    let color = null;
+    let word = null;
+
+    function setStable() { state = "stable"; draw(); }
+    function setUnstable() { state = "unstable"; draw(); }
+    function selectWord(el) { word = el.innerText; draw(); }
+    function setColor(c) { color = c; draw(); }
+
+    function saveSelection() {
+        if(!word || !color || !state) {
+            alert("Please complete all selections first.");
+            return;
+        }
+        const history = JSON.parse(localStorage.getItem("socialHistory")) || [];
+        history.push({ state, color, word, time: Date.now() });
+        localStorage.setItem("socialHistory", JSON.stringify(history));
+        window.location.href = "page2.html";
+    }
+
+    function draw() {
+        ctx.clearRect(0,0,500,500);
+        const cx = 250, cy = 250;
+        let top, left, right;
+
+        if(state === "stable") {
+            top = { x: cx, y: cy - 140 };
+            left = { x: cx - 140, y: cy + 120 };
+            right = { x: cx + 140, y: cy + 120 };
+        } else {
+            top = { x: cx, y: cy + 140 };
+            left = { x: cx - 140, y: cy - 120 };
+            right = { x: cx + 140, y: cy - 120 };
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(top.x, top.y);
+        ctx.lineTo(left.x, left.y);
+        ctx.lineTo(right.x, right.y);
+        ctx.closePath();
+
+        if(color) {
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.15;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+
+        ctx.strokeStyle = color ? color : "#DADCE0"; 
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = "round";
+        ctx.stroke();
+
+        if(word) {
+            ctx.fillStyle = "#3C4043";
+            ctx.font = "500 14px 'Google Sans', Roboto";
+            ctx.textAlign = "center";
+            ctx.fillText(word, cx, cy);
+        }
+    }
+
+    draw();
+</script>
+
+</body>
+</html> 

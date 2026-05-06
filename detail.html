@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - Social Perception Archive</title>
+    <style>
+        /* Google Material Design 3 Styling */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #ffffff; 
+            color: #1F1F1F; 
+            /* 헤더와 버튼에 사용된 메인 폰트 설정 */
+            font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif; 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        /* HEADER */
+        .header { 
+            padding: 20px 80px; 
+            background: #ffffff;
+            border-bottom: 1px solid #E0E0E0; 
+            flex-shrink: 0; 
+            display: flex; 
+            justify-content: flex-start; 
+            align-items: center; 
+        }
+        
+        .back-link { 
+            display: flex;
+            align-items: center;
+            color: #1A73E8; 
+            text-decoration: none; 
+            font-size: 14px; 
+            font-weight: 500;
+            padding: 8px 16px 8px 12px;
+            border-radius: 20px;
+            transition: background 0.2s;
+            margin-left: -12px;
+        }
+        .back-link::before {
+            content: '←';
+            margin-right: 8px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .back-link:hover { 
+            background: rgba(26, 115, 232, 0.04);
+        }
+
+        /* LAYOUT */
+        .detail-layout { 
+            display: flex; 
+            flex: 1; 
+            max-width: 1600px; 
+            margin: 0 auto; 
+            width: 100%;
+            overflow: hidden; 
+        }
+        
+        /* LEFT: VISUALIZATION */
+        .winner-section { 
+            width: 40%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            background: #ffffff;
+            border-right: 1px solid #E0E0E0; 
+            position: relative; 
+        }
+        
+        .label { 
+            position: absolute; 
+            top: 40px; 
+            font-size: 11px; 
+            color: #70757A; 
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        #winnerSvg {
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.06));
+        }
+
+        /* RIGHT: DATA LIST */
+        .stats-section { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 60px 80px; 
+            overflow-y: auto; 
+            background: #F8F9FA;
+        }
+        .list-box { width: 100%; max-width: 700px; }
+        
+        .rank-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 24px; 
+            margin-bottom: 12px;
+            background: #ffffff;
+            border: 1px solid #DADCE0;
+            border-radius: 16px;
+            font-size: 15px; 
+            color: #3C4043; 
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .rank-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(60,64,67,0.08);
+            border-color: #1A73E8;
+        }
+        .rank-item b { 
+            margin-left: auto; 
+            color: #1A73E8; 
+            font-size: 20px; 
+            font-weight: 500; 
+        }
+
+        .stats-section::-webkit-scrollbar { width: 8px; }
+        .stats-section::-webkit-scrollbar-track { background: transparent; }
+        .stats-section::-webkit-scrollbar-thumb { background: #DADCE0; border-radius: 10px; }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <a href="page2.html" class="back-link">Back</a>
+</div>
+
+<div class="detail-layout">
+    <div class="winner-section">
+        <div class="label">Top Response</div>
+        <svg id="winnerSvg" width="360" height="360" viewBox="0 0 400 400"></svg>
+    </div>
+    
+    <div class="stats-section">
+        <div class="list-box" id="listBox"></div>
+    </div>
+</div>
+
+<script>
+    const historyData = JSON.parse(localStorage.getItem("socialHistory")) || [];
+    const urlParams = new URLSearchParams(window.location.search);
+    const qType = parseInt(urlParams.get('q'));
+
+    function getColorLabel(color) {
+        const c = color.toLowerCase();
+        const colorMap = {
+            '#d93025': 'Strongly Negative',
+            '#f9ab00': 'Negative',
+            '#bdc1c6': 'Neutral',
+            '#1e8e3e': 'Positive',
+            '#1a73e8': 'Strongly Positive'
+        };
+        return colorMap[c] || "Perception";
+    }
+
+    function render() {
+        if(historyData.length === 0) {
+            document.getElementById("listBox").innerHTML = "<div class='rank-item'>No data available in archive.</div>";
+            return;
+        }
+
+        const map = {};
+        historyData.forEach(d => {
+            const k = `${d.state}|${d.color}|${d.word}`;
+            map[k] = (map[k] || 0) + 1;
+        });
+
+        const winKey = Object.keys(map).reduce((a, b) => map[a] > map[b] ? a : b);
+        const win = winKey.split("|");
+
+        const svg = document.getElementById("winnerSvg");
+        const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        
+        poly.setAttribute("points", win[0] === "stable" ? "200,50 30,350 370,350" : "30,50 370,50 200,350");
+        poly.setAttribute("fill", win[1]);
+        poly.setAttribute("fill-opacity", "0.12");
+        poly.setAttribute("stroke", win[1]);
+        poly.setAttribute("stroke-width", "3.5");
+        poly.setAttribute("stroke-linejoin", "round");
+        svg.appendChild(poly);
+
+        const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txt.setAttribute("x", "200");
+        txt.setAttribute("y", win[0] === "stable" ? 260 : 150);
+        txt.setAttribute("fill", "#1F1F1F");
+        txt.setAttribute("font-size", "16");
+        txt.setAttribute("font-weight", "500");
+        /* BACK 버튼과 완전히 동일한 폰트 설정 적용 */
+        txt.setAttribute("font-family", "'Google Sans', Roboto, Helvetica, Arial, sans-serif");
+        txt.setAttribute("text-anchor", "middle");
+        txt.textContent = win[2].toUpperCase();
+        svg.appendChild(txt);
+
+        const list = document.getElementById("listBox");
+        list.innerHTML = "";
+
+        if(qType === 1) {
+            const s = historyData.filter(d => d.state === 'stable').length;
+            const p = Math.round((s/historyData.length)*100);
+            list.innerHTML = `
+                <div class="rank-item">Stable Status <b>${p}%</b></div>
+                <div class="rank-item">Unstable Status <b>${100-p}%</b></div>`;
+        } 
+        else if(qType === 2) {
+            const words = {};
+            historyData.forEach(d => words[d.word] = (words[d.word] || 0) + 1);
+
+            Object.keys(words)
+                .sort((a,b) => words[b]-words[a])
+                .forEach(w => {
+                    list.innerHTML += `
+                        <div class="rank-item">
+                            ${w}
+                            <b>${Math.round((words[w]/historyData.length)*100)}%</b>
+                        </div>`;
+                });
+        } 
+        else if(qType === 3) {
+            const colors = {};
+            historyData.forEach(d => colors[d.color] = (colors[d.color] || 0) + 1);
+
+            Object.keys(colors)
+                .sort((a,b) => colors[b]-colors[a])
+                .forEach(c => {
+                    const label = getColorLabel(c);
+                    list.innerHTML += `
+                        <div class="rank-item">
+                            <div style="width:14px; height:14px; background:${c}; margin-right:20px; border-radius:50%; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px ${c}33;"></div>
+                            ${label}
+                            <b>${Math.round((colors[c]/historyData.length)*100)}%</b>
+                        </div>`;
+                });
+        }
+    }
+
+    render();
+</script>
+
+</body>
+</html>
